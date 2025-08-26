@@ -16,15 +16,18 @@ let mockedTodos: Todo[] = [
 export default function Home() {
   const [todos, setTodos] = useState(mockedTodos);
 
-  const handleDelete = () => {
-    const setTodo = todos.pop();
-  };
-
   return (
     <main>
       <ul>
         {todos.map((t) => (
-          <li key={t.id}>{t.text}</li>
+          <li key={t.id}>
+            {t.text}{" "}
+            <button
+              onClick={() => setTodos(todos.filter(({ id }) => t.id !== id))}
+            >
+              🗑️
+            </button>
+          </li>
         ))}
       </ul>
     </main>
