@@ -7,10 +7,8 @@ describe("todo", () => {
   });
   it("should be able to delete todo", () => {
     cy.visit("http://localhost:3000");
-    cy.get("button").first().click();
-    cy.get("li")
-      .should("have.length", 2)
-      .first()
-      .should("not.contain.text", "Feed the cat");
+    cy.contains("Feed the cat").find("button").click();
+    cy.get("li").should("have.length", 2);
+    cy.contains("Feed the cat").should("not.exist");
   });
 });
