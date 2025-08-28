@@ -3,7 +3,6 @@ import { defineConfig } from "cypress";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import waitOn from "wait-on";
 import { Todo } from "./generated/prisma";
-import { db } from "./prisma/db";
 
 export default defineConfig({
   e2e: {
@@ -38,9 +37,10 @@ export default defineConfig({
       process.on("exit", cleanup);
 
       // 5) Reseeda databasen så att testerna blir oberoende av varandra
-
+      process.env.DATABASE_URL = dbUri;
       on("task", {
         async reseed() {
+          const { db } = await import("./prisma/db");
           await db.todo.deleteMany();
           let mockedTodos: Todo[] = [
             { id: "68adb3200c2c50f13d0a64f7", text: "Feed the cat" },
