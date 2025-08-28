@@ -14,17 +14,21 @@ export default defineConfig({
       const dbUri = mongo.getUri("cypress-test");
 
       // 2) Starta Next.js-servern (på en annan port som ansluter till 1)
-      const server = spawn(
-        "npx",
-        ["next", "dev", "--turbopack", "-p", "3100"],
-        {
+      let server: any;
+      try {
+        server = spawn("npx", ["next", "dev", "--turbopack", "-p", "3100"], {
           env: {
+            ...process.env,
             NODE_ENV: "test",
             DATABASE_URL: dbUri,
           },
           stdio: "inherit",
-        }
-      );
+          shell: true, // <- viktig på Windows
+        });
+      } catch (error) {
+        console.error("error");
+        process.exit(1);
+      }
 
       // 3) Vänta på att Next.js servern är igång innan cypress kör vidare
       await waitOn({ resources: ["http://localhost:3100"], timeout: 60_000 });
@@ -34,7 +38,8 @@ export default defineConfig({
         server.kill();
         await mongo.stop();
       };
-      process.on("exit", cleanup);
+      on("after:run", cleanup);
+      process.on("SIGTERM", cleanup);
 
       // 5) Reseeda databasen så att testerna blir oberoende av varandra
       process.env.DATABASE_URL = dbUri;
