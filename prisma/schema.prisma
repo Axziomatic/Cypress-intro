@@ -14,7 +14,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Todo {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
-  text String
+model FoodEntry {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  calories Int
+  protein  Int
+  fat      Int
+  carbs    Int
+  date     DateTime @default(now())
 }
+
+model UserGoal {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  calories Int
+  protein  Int
+  fat      Int
+  carbs    Int
+}
+
+// model Todo {
+//   id   String @id @default(auto()) @map("_id") @db.ObjectId
+//   text String
+// }

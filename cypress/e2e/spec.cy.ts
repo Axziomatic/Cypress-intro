@@ -1,12 +1,25 @@
-describe("todo", () => {
+describe("Nutrition Tracker", () => {
   beforeEach(() => {
     cy.task("reseed");
   });
-  it("should display three todos by default", () => {
+  it("should allow the user to log a food entry and see it in today's list", () => {
     cy.visit("/");
-    cy.get("li").should("have.length", 3);
-    cy.get("li").first().should("contain.text", "Feed the cat");
-    cy.get("li").last().contains("Walk all the cats");
+
+    cy.get('input[name="food"]').type("Ägg");
+    cy.get('input[name="calories"]').type("150");
+    cy.get('input[name="protein"]').type("12");
+    cy.get('input[name="fat"]').type("10");
+    cy.get('input[name="carbs"]').type("1");
+
+    cy.contains("Submit").click();
+
+    cy.get("ul").should("contain.text", "Ägg");
+    cy.get("ul").should("contain.text", "150 kcal");
+
+    cy.get('[data-testid="progress-calores"]').should(
+      "contain.text",
+      "150 / 2000"
+    );
   });
   it("should be able to delete todo", () => {
     cy.visit("/");
