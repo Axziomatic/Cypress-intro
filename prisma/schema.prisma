@@ -15,13 +15,13 @@ datasource db {
 }
 
 model FoodEntry {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   name     String
-  calories Int
-  protein  Int
-  fat      Int
-  carbs    Int
-  date     DateTime @default(now())
+  calories Float
+  protein  Float
+  fat      Float
+  carbs    Float
+  // date     DateTime @default(now())
 }
 
 model UserGoal {

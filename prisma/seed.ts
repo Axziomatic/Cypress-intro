@@ -1,21 +1,13 @@
-import { PrismaClient, Todo } from "@/generated/prisma";
 import { db } from "./db";
 
-const prisma = new PrismaClient();
-
 async function main() {
-  let mockedTodos: Todo[] = [
-    { id: "68adb3200c2c50f13d0a64f7", text: "Feed the cat" },
-    { id: "68adb3200c2c50f13d0a64f8", text: "Ignore the dog" },
-    { id: "68adb3200c2c50f13d0a64f9", text: "Walk all the cats" },
+  const mockedFoods = [
+    { name: "Ägg", calories: 150, protein: 12, fat: 10, carbs: 1 },
+    { name: "Banan", calories: 100, protein: 1, fat: 0, carbs: 27 },
   ];
 
-  for (const { id, ...todo } of mockedTodos) {
-    await db.todo.upsert({
-      where: { id },
-      update: todo,
-      create: { id, ...todo },
-    });
+  for (const food of mockedFoods) {
+    await db.foodEntry.create({ data: food });
   }
 }
 

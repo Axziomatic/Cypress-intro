@@ -1,8 +1,9 @@
-import { spawn } from "child_process";
+import { spawn, type ChildProcess } from "child_process";
 import { defineConfig } from "cypress";
+import { ObjectId } from "mongodb";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import waitOn from "wait-on";
-import { Todo } from "./generated/prisma";
+import { FoodEntry } from "./generated/prisma";
 
 export default defineConfig({
   e2e: {
@@ -14,7 +15,7 @@ export default defineConfig({
       const dbUri = mongo.getUri("cypress-test");
 
       // 2) Starta Next.js-servern (på en annan port som ansluter till 1)
-      let server: any;
+      let server: ChildProcess;
       try {
         server = spawn("npx", ["next", "dev", "--turbopack", "-p", "3100"], {
           env: {
@@ -46,18 +47,39 @@ export default defineConfig({
       on("task", {
         async reseed() {
           const { db } = await import("./prisma/db");
-          await db.todo.deleteMany();
-          let mockedTodos: Todo[] = [
-            { id: "68adb3200c2c50f13d0a64f7", text: "Feed the cat" },
-            { id: "68adb3200c2c50f13d0a64f8", text: "Ignore the dog" },
-            { id: "68adb3200c2c50f13d0a64f9", text: "Walk all the cats" },
+          await db.foodEntry.deleteMany();
+          const mockedFoods: FoodEntry[] = [
+            {
+              id: new ObjectId().toHexString(),
+              name: "Apple",
+              calories: 52,
+              protein: 0.3,
+              fat: 0.2,
+              carbs: 14,
+            },
+            {
+              id: new ObjectId().toHexString(),
+              name: "Banana",
+              calories: 89,
+              protein: 1.1,
+              fat: 0.3,
+              carbs: 23,
+            },
+            {
+              id: new ObjectId().toHexString(),
+              name: "Carrot",
+              calories: 41,
+              protein: 0.9,
+              fat: 0.2,
+              carbs: 10,
+            },
           ];
 
-          for (const { id, ...todo } of mockedTodos) {
-            await db.todo.upsert({
+          for (const { id, ...food } of mockedFoods) {
+            await db.foodEntry.upsert({
               where: { id },
-              update: todo,
-              create: { id, ...todo },
+              update: food,
+              create: { id, ...food },
             });
           }
 

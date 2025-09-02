@@ -11,20 +11,14 @@ describe("Nutrition Tracker", () => {
     cy.get('input[name="fat"]').type("10");
     cy.get('input[name="carbs"]').type("1");
 
-    cy.contains("Submit").click();
+    cy.contains("Add").click();
 
     cy.get("ul").should("contain.text", "Ägg");
     cy.get("ul").should("contain.text", "150 kcal");
 
-    cy.get('[data-testid="progress-calores"]').should(
+    cy.get('[data-testid="progress-calories"]').should(
       "contain.text",
       "150 / 2000"
     );
-  });
-  it("should be able to delete todo", () => {
-    cy.visit("/");
-    cy.contains("Feed the cat").find("button").click();
-    cy.get("li").should("have.length", 2);
-    cy.contains("Feed the cat").should("not.exist");
   });
 });
