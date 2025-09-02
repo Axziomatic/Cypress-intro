@@ -38,7 +38,7 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main className="bg-slate-200 h-screen">
       <form onSubmit={handleSubmit}>
         <input
           name="food"
