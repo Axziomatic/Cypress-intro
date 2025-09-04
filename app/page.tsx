@@ -17,11 +17,24 @@ export default function Home() {
     carbs: "",
   });
 
-  const dailyGoal = { calories: 2000 };
+  const dailyGoal = { calories: 2000, protein: 50, fat: 70, carbs: 300 };
 
   const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);
-  const exceeded = totalCalories > dailyGoal.calories;
-  const excessAmount = totalCalories - dailyGoal.calories;
+  const totalProtein = foods.reduce((sum, f) => sum + f.protein, 0);
+  const totalFat = foods.reduce((sum, f) => sum + f.fat, 0);
+  const totalCarbs = foods.reduce((sum, f) => sum + f.carbs, 0);
+
+  const exceededCalories = totalCalories > dailyGoal.calories;
+  const excessCalories = totalCalories - dailyGoal.calories;
+
+  const exceededProtein = totalProtein > dailyGoal.protein;
+  const excessProtein = totalProtein - dailyGoal.protein;
+
+  const exceededFat = totalFat > dailyGoal.fat;
+  const excessFat = totalFat - dailyGoal.fat;
+
+  const exceededCarbs = totalCarbs > dailyGoal.carbs;
+  const excessCarbs = totalCarbs - dailyGoal.carbs;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -110,13 +123,14 @@ export default function Home() {
             </li>
           ))}
         </ul>
+        {/* Calories */}
         <div className="mt-6">
           <div
             data-testid="progress-calories"
             className="flex justify-between text-sm text-gray-700 mb-1"
           >
             <span>
-              {totalCalories} / {dailyGoal.calories}
+              Calories: {totalCalories} kcal / {dailyGoal.calories} kcal
             </span>
           </div>
           <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
@@ -131,9 +145,93 @@ export default function Home() {
             ></div>
           </div>
           <div>
-            {exceeded && (
+            {exceededCalories && (
               <p className="mt-2 text-red-600 font-semibold">
-                You have exceeded your calorie goal by {excessAmount} kcal
+                You have exceeded your calorie goal by {excessCalories} kcal
+              </p>
+            )}
+          </div>
+        </div>
+        {/* Protein */}
+        <div className="mt-6">
+          <div
+            data-testid="progress-protein"
+            className="flex justify-between text-sm text-gray-700 mb-1"
+          >
+            <span>
+              Protein: {totalProtein} g / {dailyGoal.protein} g
+            </span>
+          </div>
+          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-500 transition-all duration-500"
+              style={{
+                width: `${Math.min(
+                  (totalProtein / dailyGoal.protein) * 100,
+                  100
+                )}%`,
+              }}
+            ></div>
+          </div>
+          <div>
+            {exceededProtein && (
+              <p className="mt-2 text-red-600 font-semibold">
+                You have exceeded your protein goal by {excessProtein} g
+              </p>
+            )}
+          </div>
+        </div>
+        {/* fat */}
+        <div className="mt-6">
+          <div
+            data-testid="progress-fat"
+            className="flex justify-between text-sm text-gray-700 mb-1"
+          >
+            <span>
+              {totalFat} g / {dailyGoal.fat} g
+            </span>
+          </div>
+          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-500 transition-all duration-500"
+              style={{
+                width: `${Math.min((totalFat / dailyGoal.fat) * 100, 100)}%`,
+              }}
+            ></div>
+          </div>
+          <div>
+            {exceededFat && (
+              <p className="mt-2 text-red-600 font-semibold">
+                You have exceeded your calorie goal by {excessFat} g
+              </p>
+            )}
+          </div>
+        </div>
+        {/* carbs */}
+        <div className="mt-6">
+          <div
+            data-testid="progress-carbs"
+            className="flex justify-between text-sm text-gray-700 mb-1"
+          >
+            <span>
+              {totalCarbs} g / {dailyGoal.carbs} g
+            </span>
+          </div>
+          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-500 transition-all duration-500"
+              style={{
+                width: `${Math.min(
+                  (totalCarbs / dailyGoal.carbs) * 100,
+                  100
+                )}%`,
+              }}
+            ></div>
+          </div>
+          <div>
+            {exceededCarbs && (
+              <p className="mt-2 text-red-600 font-semibold">
+                You have exceeded your calorie goal by {excessCarbs} g
               </p>
             )}
           </div>

@@ -18,7 +18,7 @@ describe("Nutrition Tracker", () => {
 
     cy.get('[data-testid="progress-calories"]').should(
       "contain.text",
-      "150 / 2000"
+      "150 kcal / 2000 kcal"
     );
   });
   it("should show a warning when the user exceeds the calorie goal", () => {
@@ -33,7 +33,7 @@ describe("Nutrition Tracker", () => {
 
     cy.get('[data-testid="progress-calories"]').should(
       "contain.text",
-      "2000 / 2000"
+      "2000 kcal / 2000 kcal"
     );
 
     cy.get('input[name="food"').clear().type("Snack");
@@ -50,6 +50,8 @@ describe("Nutrition Tracker", () => {
   });
 
   it("should show totals for today's intake", () => {
+    cy.visit("/");
+
     cy.get('input[name="food"]').type("Ägg");
     cy.get('input[name="calories"]').type("150");
     cy.get('input[name="protein"]').type("12");
@@ -64,9 +66,12 @@ describe("Nutrition Tracker", () => {
     cy.get('input[name="carbs"]').type("27");
     cy.contains("Add").click();
 
-    cy.get('input[data-testid="totals"]').should("contain.text", "250kcal");
-    cy.get('input[data-testid="totals"]').should("contain.text", "13g protein");
-    cy.get('input[data-testid="totals"]').should("contain.text", "10g fat");
-    cy.get('input[data-testid="totals"]').should("contain.text", "28g carbs");
+    cy.get('[data-testid="progress-calories"]').should(
+      "contain.text",
+      "250 kcal"
+    );
+    cy.get('[data-testid="progress-protein"]').should("contain.text", "13 g");
+    cy.get('[data-testid="progress-fat"]').should("contain.text", "10 g");
+    cy.get('[data-testid="progress-carbs"]').should("contain.text", "28 g");
   });
 });
