@@ -74,4 +74,59 @@ describe("Nutrition Tracker", () => {
     cy.get('[data-testid="progress-fat"]').should("contain.text", "10 g");
     cy.get('[data-testid="progress-carbs"]').should("contain.text", "28 g");
   });
+
+  //TESTING FOR CRUD
+
+  // 1. CREATE
+
+  it("should create a new food entry", () => {
+    cy.visit("/");
+
+    cy.get('input[name="food"]').type("Yoghurt");
+    cy.get('input[name="calories"]').type("120");
+    cy.get('input[name="protein"]').type("5");
+    cy.get('input[name="fat"]').type("2");
+    cy.get('input[name="carbs"]').type("15");
+    cy.contains("Add").click();
+
+    cy.get("ul").should("contain.text", "Yoghurt");
+    cy.get("ul").should("contain.text", "120 kcal");
+  });
+
+  // 2. READ
+  it("should display all today's food entries", () => {
+    cy.visit("/");
+
+    cy.get("ul li").should("have.length.greaterThan", 0);
+    cy.get('[data-testid="progress-calories"]').should("contain.text", "kcal");
+  });
+
+  // 3. UPDATE
+  it("should update an existing food entry", () => {
+    cy.visit("/");
+
+    cy.get("ul li")
+      .first()
+      .within(() => {
+        cy.get("button").contains("Edit").click();
+      });
+
+    cy.get('input[name="calories"]').clear().type("200");
+    cy.contains("Save").click();
+
+    cy.get("ul li").first().should("contain.text", "200 kcal");
+  });
+
+  // 4. DELETE
+  it("should delete a food entry", () => {
+    cy.visit("/");
+
+    cy.get("ul li")
+      .first()
+      .within(() => {
+        cy.get("button").contains("Delete").click();
+      });
+
+    cy.get("ul li").should("have.length.lessThan", 3);
+  });
 });
