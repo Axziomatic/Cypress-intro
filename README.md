@@ -59,7 +59,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 3 Loggar ytterligare mat som gör att totalen blir > 2000 kcal.
 
-4 Appen visar en varning (t.ex. röd text: "Du har överskridit ditt kalorimål!").
+4 Appen visar en varning och hur mycket användaren har överskridit målet med (t.ex. röd text: "Du har överskridit ditt kalorimål med 250 kcal!").
 
 ## 3. Se dagens sammanfattning
 
