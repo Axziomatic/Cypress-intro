@@ -20,6 +20,8 @@ export default function Home() {
   const dailyGoal = { calories: 2000 };
 
   const totalCalories = foods.reduce((sum, f) => sum + f.calories, 0);
+  const exceeded = totalCalories > dailyGoal.calories;
+  const excessAmount = totalCalories - dailyGoal.calories;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -113,8 +115,9 @@ export default function Home() {
             data-testid="progress-calories"
             className="flex justify-between text-sm text-gray-700 mb-1"
           >
-            <span>{totalCalories} kcal</span>
-            <span>{dailyGoal.calories} kcal</span>
+            <span>
+              {totalCalories} / {dailyGoal.calories}
+            </span>
           </div>
           <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -126,6 +129,13 @@ export default function Home() {
                 )}%`,
               }}
             ></div>
+          </div>
+          <div>
+            {exceeded && (
+              <p className="mt-2 text-red-600 font-semibold">
+                You have exceeded your calorie goal by {excessAmount} kcal
+              </p>
+            )}
           </div>
         </div>
       </section>

@@ -18,14 +18,14 @@ describe("Nutrition Tracker", () => {
 
     cy.get('[data-testid="progress-calories"]').should(
       "contain.text",
-      "150 kcal2000 kcal"
+      "150 / 2000"
     );
   });
   it("should show a warning when the user exceeds the calorie goal", () => {
     cy.visit("/");
 
     cy.get('input[name="food').type("Big Meal");
-    cy.get('input[name="calories').type("200");
+    cy.get('input[name="calories').type("2000");
     cy.get('input[name="protein').type("50");
     cy.get('input[name="fat').type("70");
     cy.get('input[name="carbs').type("200");
@@ -33,7 +33,7 @@ describe("Nutrition Tracker", () => {
 
     cy.get('[data-testid="progress-calories"]').should(
       "contain.text",
-      "2000/2000"
+      "2000 / 2000"
     );
 
     cy.get('input[name="food"').clear().type("Snack");
@@ -44,7 +44,7 @@ describe("Nutrition Tracker", () => {
 
     cy.contains("Add").click();
 
-    cy.contains("Du har överskridit ditt kalorimål med 250 kcal")
+    cy.contains("You have exceeded your calorie goal by 250 kcal")
       .should("be.visible")
       .and("have.class", "text-red-600");
   });
