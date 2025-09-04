@@ -16,6 +16,7 @@ export default function Home() {
     fat: "",
     carbs: "",
   });
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const dailyGoal = { calories: 2000, protein: 50, fat: 70, carbs: 300 };
 
@@ -38,17 +39,37 @@ export default function Home() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setFoods([
-      ...foods,
-      {
-        id: "temp-" + crypto.randomUUID(), // tillfälligt ID för UI
-        name: form.name,
-        calories: Number(form.calories),
-        protein: Number(form.protein),
-        fat: Number(form.fat),
-        carbs: Number(form.carbs),
-      },
-    ]);
+    if (editingId) {
+      // update
+      setFoods((prev) =>
+        prev.map((f) =>
+          f.id === editingId
+            ? {
+                ...f,
+                name: form.name,
+                calories: Number(form.calories),
+                protein: Number(form.protein),
+                fat: Number(form.fat),
+                carbs: Number(form.carbs),
+              }
+            : f
+        )
+      );
+      setEditingId(null);
+    } else {
+      // create
+      setFoods([
+        ...foods,
+        {
+          id: "temp-" + crypto.randomUUID(),
+          name: form.name,
+          calories: Number(form.calories),
+          protein: Number(form.protein),
+          fat: Number(form.fat),
+          carbs: Number(form.carbs),
+        },
+      ]);
+    }
     setForm({ name: "", calories: "", protein: "", fat: "", carbs: "" });
   }
 
@@ -116,10 +137,40 @@ export default function Home() {
           {foods.map((f) => (
             <li
               key={f.id}
-              className="bg-white shadow-sm border border-gray-200 rounded-xl p-3 flex justify-between"
+              className="bg-white shadow-sm border border-gray-200 rounded-xl p-3 flex justify-between items-center"
+              data-testid={`food-item-${f.id}`}
             >
-              <span className="font-medium text-gray-700">{f.name}</span>
-              <span className="text-gray-900">{f.calories} kcal</span>
+              <div className="flex flex-col">
+                <span className="font-medium text-gray-700">{f.name}</span>
+                <span className="text-gray-900">{f.calories} kcal</span>
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white py-1 px-3 rounded-lg text-sm"
+                  onClick={() => {
+                    setForm({
+                      name: f.name,
+                      calories: String(f.calories),
+                      protein: String(f.protein),
+                      fat: String(f.fat),
+                      carbs: String(f.carbs),
+                    });
+                    setEditingId(f.id);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg text-sm"
+                  onClick={() =>
+                    setFoods(foods.filter((food) => food.id !== f.id))
+                  }
+                >
+                  Delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>
