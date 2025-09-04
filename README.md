@@ -65,11 +65,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 1 Användaren har loggat flera matintag.
 
-2 Går till "Dagens intag"-sidan.
+2 Ser en lista över alla matintag.
 
-3 Ser en lista över alla matintag.
-
-4 Ser totalsummor (kalorier, protein, fett, kolhydrater) summerade längst ner.
+3 Ser totalsummor (kalorier, protein, fett, kolhydrater) summerade längst ner.
 
 ## 4. Se veckans sammanfattning
 

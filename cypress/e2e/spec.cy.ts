@@ -48,4 +48,25 @@ describe("Nutrition Tracker", () => {
       .should("be.visible")
       .and("have.class", "text-red-600");
   });
+
+  it("should show totals for today's intake", () => {
+    cy.get('input[name="food"]').type("Ägg");
+    cy.get('input[name="calories"]').type("150");
+    cy.get('input[name="protein"]').type("12");
+    cy.get('input[name="fat"]').type("10");
+    cy.get('input[name="carbs"]').type("1");
+    cy.contains("Add").click();
+
+    cy.get('input[name="food"]').type("Banan");
+    cy.get('input[name="calories"]').type("100");
+    cy.get('input[name="protein"]').type("1");
+    cy.get('input[name="fat"]').type("0");
+    cy.get('input[name="carbs"]').type("27");
+    cy.contains("Add").click();
+
+    cy.get('input[data-testid="totals"]').should("contain.text", "250kcal");
+    cy.get('input[data-testid="totals"]').should("contain.text", "13g protein");
+    cy.get('input[data-testid="totals"]').should("contain.text", "10g fat");
+    cy.get('input[data-testid="totals"]').should("contain.text", "28g carbs");
+  });
 });
