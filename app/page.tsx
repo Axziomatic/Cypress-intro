@@ -1,13 +1,22 @@
 "use client";
 
-import { db } from "@/prisma/db";
-import { useState } from "react";
+import {
+  createFoodEntry,
+  deleteFoodEntry,
+  getAllFoodEntries,
+} from "@/app/actions/foodActions";
+import { useEffect, useState } from "react";
+
+type FoodEntry = {
+  id: string;
+  name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+};
 
 export default function Home() {
-  type FoodEntry = NonNullable<
-    Awaited<ReturnType<typeof db.foodEntry.findFirst>>
-  >;
-
   const [foods, setFoods] = useState<FoodEntry[]>([]);
   const [form, setForm] = useState({
     name: "",
@@ -26,21 +35,28 @@ export default function Home() {
   const totalCarbs = foods.reduce((sum, f) => sum + f.carbs, 0);
 
   const exceededCalories = totalCalories > dailyGoal.calories;
-  const excessCalories = totalCalories - dailyGoal.calories;
-
   const exceededProtein = totalProtein > dailyGoal.protein;
-  const excessProtein = totalProtein - dailyGoal.protein;
-
   const exceededFat = totalFat > dailyGoal.fat;
-  const excessFat = totalFat - dailyGoal.fat;
-
   const exceededCarbs = totalCarbs > dailyGoal.carbs;
+
+  const excessCalories = totalCalories - dailyGoal.calories;
+  const excessProtein = totalProtein - dailyGoal.protein;
+  const excessFat = totalFat - dailyGoal.fat;
   const excessCarbs = totalCarbs - dailyGoal.carbs;
 
-  function handleSubmit(e: React.FormEvent) {
+  useEffect(() => {
+    async function fetchFoods() {
+      const allFoods = await getAllFoodEntries();
+      setFoods(allFoods);
+    }
+    fetchFoods();
+  }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (editingId) {
-      // update
+      // update existing entry (just client-side for nu)
       setFoods((prev) =>
         prev.map((f) =>
           f.id === editingId
@@ -57,27 +73,65 @@ export default function Home() {
       );
       setEditingId(null);
     } else {
-      // create
-      setFoods([
-        ...foods,
-        {
-          id: "temp-" + crypto.randomUUID(),
-          name: form.name,
-          calories: Number(form.calories),
-          protein: Number(form.protein),
-          fat: Number(form.fat),
-          carbs: Number(form.carbs),
-        },
-      ]);
+      const newEntry = await createFoodEntry({
+        name: form.name,
+        calories: Number(form.calories),
+        protein: Number(form.protein),
+        fat: Number(form.fat),
+        carbs: Number(form.carbs),
+      });
+      setFoods([...foods, newEntry]);
     }
+
     setForm({ name: "", calories: "", protein: "", fat: "", carbs: "" });
   }
+
+  async function handleDelete(id: string) {
+    await deleteFoodEntry(id);
+    setFoods(foods.filter((f) => f.id !== id));
+  }
+
+  const nutrientProgress = [
+    {
+      name: "Calories",
+      total: totalCalories,
+      goal: dailyGoal.calories,
+      exceeded: exceededCalories,
+      excess: excessCalories,
+      unit: "kcal",
+    },
+    {
+      name: "Protein",
+      total: totalProtein,
+      goal: dailyGoal.protein,
+      exceeded: exceededProtein,
+      excess: excessProtein,
+      unit: "g",
+    },
+    {
+      name: "Fat",
+      total: totalFat,
+      goal: dailyGoal.fat,
+      exceeded: exceededFat,
+      excess: excessFat,
+      unit: "g",
+    },
+    {
+      name: "Carbs",
+      total: totalCarbs,
+      goal: dailyGoal.carbs,
+      exceeded: exceededCarbs,
+      excess: excessCarbs,
+      unit: "g",
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-orange-50 to-green-200 flex flex-col items-center p-6">
       <h1 className="text-2xl font-bold text-green-700 text-center mb-4">
         Nutrition Tracker
       </h1>
+
       <form
         onSubmit={handleSubmit}
         className="bg-white shadow-md rounded-2xl p-6 w-full max-w-md space-y-4"
@@ -125,7 +179,7 @@ export default function Home() {
           type="submit"
           className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition"
         >
-          Add
+          {editingId ? "Save" : "Add"}
         </button>
       </form>
 
@@ -137,156 +191,72 @@ export default function Home() {
           {foods.map((f) => (
             <li
               key={f.id}
-              className="bg-white shadow-sm border border-gray-200 rounded-xl p-3 flex justify-between items-center"
-              data-testid={`food-item-${f.id}`}
+              className="bg-white shadow-sm border border-gray-200 rounded-xl p-3 flex justify-between"
             >
-              <div className="flex flex-col">
+              <div>
                 <span className="font-medium text-gray-700">{f.name}</span>
-                <span className="text-gray-900">{f.calories} kcal</span>
+                <div className="text-sm text-gray-500">
+                  {f.calories} kcal | {f.protein} g protein | {f.fat} g fat |{" "}
+                  {f.carbs} g carbs
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  type="button"
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white py-1 px-3 rounded-lg text-sm"
-                  onClick={() => {
-                    setForm({
-                      name: f.name,
-                      calories: String(f.calories),
-                      protein: String(f.protein),
-                      fat: String(f.fat),
-                      carbs: String(f.carbs),
-                    });
-                    setEditingId(f.id);
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg text-sm"
-                  onClick={() =>
-                    setFoods(foods.filter((food) => food.id !== f.id))
-                  }
-                >
-                  Delete
-                </button>
-              </div>
+              <button
+                type="button"
+                className="bg-yellow-400 hover:bg-yellow-500 text-white py-1 px-3 rounded-lg text-sm"
+                onClick={() => {
+                  setForm({
+                    name: f.name,
+                    calories: String(f.calories),
+                    protein: String(f.protein),
+                    fat: String(f.fat),
+                    carbs: String(f.carbs),
+                  });
+                  setEditingId(f.id);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-lg text-sm"
+                onClick={() => handleDelete(f.id)}
+              >
+                Delete
+              </button>
             </li>
           ))}
         </ul>
-        {/* Calories */}
-        <div className="mt-6">
-          <div
-            data-testid="progress-calories"
-            className="flex justify-between text-sm text-gray-700 mb-1"
-          >
-            <span>
-              Calories: {totalCalories} kcal / {dailyGoal.calories} kcal
-            </span>
-          </div>
-          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+
+        {nutrientProgress.map((nutrient) => (
+          <div key={nutrient.name} className="mt-6">
             <div
-              className="h-full bg-green-500 transition-all duration-500"
-              style={{
-                width: `${Math.min(
-                  (totalCalories / dailyGoal.calories) * 100,
-                  100
-                )}%`,
-              }}
-            ></div>
-          </div>
-          <div>
-            {exceededCalories && (
+              data-testid={`progress-${nutrient.name.toLowerCase()}`}
+              className="flex justify-between text-sm text-gray-700 mb-1"
+            >
+              <span>
+                {nutrient.name}: {nutrient.total} {nutrient.unit} /{" "}
+                {nutrient.goal} {nutrient.unit}
+              </span>
+            </div>
+            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-green-500 transition-all duration-500"
+                style={{
+                  width: `${Math.min(
+                    (nutrient.total / nutrient.goal) * 100,
+                    100
+                  )}%`,
+                }}
+              ></div>
+            </div>
+            {nutrient.exceeded && (
               <p className="mt-2 text-red-600 font-semibold">
-                You have exceeded your calorie goal by {excessCalories} kcal
+                You have exceeded your {nutrient.name.toLowerCase()} goal by{" "}
+                {nutrient.excess} {nutrient.unit}
               </p>
             )}
           </div>
-        </div>
-        {/* Protein */}
-        <div className="mt-6">
-          <div
-            data-testid="progress-protein"
-            className="flex justify-between text-sm text-gray-700 mb-1"
-          >
-            <span>
-              Protein: {totalProtein} g / {dailyGoal.protein} g
-            </span>
-          </div>
-          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-500 transition-all duration-500"
-              style={{
-                width: `${Math.min(
-                  (totalProtein / dailyGoal.protein) * 100,
-                  100
-                )}%`,
-              }}
-            ></div>
-          </div>
-          <div>
-            {exceededProtein && (
-              <p className="mt-2 text-red-600 font-semibold">
-                You have exceeded your protein goal by {excessProtein} g
-              </p>
-            )}
-          </div>
-        </div>
-        {/* fat */}
-        <div className="mt-6">
-          <div
-            data-testid="progress-fat"
-            className="flex justify-between text-sm text-gray-700 mb-1"
-          >
-            <span>
-              {totalFat} g / {dailyGoal.fat} g
-            </span>
-          </div>
-          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-500 transition-all duration-500"
-              style={{
-                width: `${Math.min((totalFat / dailyGoal.fat) * 100, 100)}%`,
-              }}
-            ></div>
-          </div>
-          <div>
-            {exceededFat && (
-              <p className="mt-2 text-red-600 font-semibold">
-                You have exceeded your calorie goal by {excessFat} g
-              </p>
-            )}
-          </div>
-        </div>
-        {/* carbs */}
-        <div className="mt-6">
-          <div
-            data-testid="progress-carbs"
-            className="flex justify-between text-sm text-gray-700 mb-1"
-          >
-            <span>
-              {totalCarbs} g / {dailyGoal.carbs} g
-            </span>
-          </div>
-          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-500 transition-all duration-500"
-              style={{
-                width: `${Math.min(
-                  (totalCarbs / dailyGoal.carbs) * 100,
-                  100
-                )}%`,
-              }}
-            ></div>
-          </div>
-          <div>
-            {exceededCarbs && (
-              <p className="mt-2 text-red-600 font-semibold">
-                You have exceeded your calorie goal by {excessCarbs} g
-              </p>
-            )}
-          </div>
-        </div>
+        ))}
       </section>
     </main>
   );

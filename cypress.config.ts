@@ -1,9 +1,7 @@
 import { spawn, type ChildProcess } from "child_process";
 import { defineConfig } from "cypress";
-import { ObjectId } from "mongodb";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
 import waitOn from "wait-on";
-import { FoodEntry } from "./generated/prisma";
 
 export default defineConfig({
   e2e: {
@@ -48,40 +46,40 @@ export default defineConfig({
         async reseed() {
           const { db } = await import("./prisma/db");
           await db.foodEntry.deleteMany();
-          const mockedFoods: FoodEntry[] = [
-            {
-              id: new ObjectId().toHexString(),
-              name: "Apple",
-              calories: 52,
-              protein: 0.3,
-              fat: 0.2,
-              carbs: 14,
-            },
-            {
-              id: new ObjectId().toHexString(),
-              name: "Banana",
-              calories: 89,
-              protein: 1.1,
-              fat: 0.3,
-              carbs: 23,
-            },
-            {
-              id: new ObjectId().toHexString(),
-              name: "Carrot",
-              calories: 41,
-              protein: 0.9,
-              fat: 0.2,
-              carbs: 10,
-            },
-          ];
+          // const mockedFoods: FoodEntry[] = [
+          //   {
+          //     id: new ObjectId().toHexString(),
+          //     name: "Apple",
+          //     calories: 52,
+          //     protein: 0.3,
+          //     fat: 0.2,
+          //     carbs: 14,
+          //   },
+          //   {
+          //     id: new ObjectId().toHexString(),
+          //     name: "Banana",
+          //     calories: 89,
+          //     protein: 1.1,
+          //     fat: 0.3,
+          //     carbs: 23,
+          //   },
+          //   {
+          //     id: new ObjectId().toHexString(),
+          //     name: "Carrot",
+          //     calories: 41,
+          //     protein: 0.9,
+          //     fat: 0.2,
+          //     carbs: 10,
+          //   },
+          // ];
 
-          for (const { id, ...food } of mockedFoods) {
-            await db.foodEntry.upsert({
-              where: { id },
-              update: food,
-              create: { id, ...food },
-            });
-          }
+          // for (const { id, ...food } of mockedFoods) {
+          //   await db.foodEntry.upsert({
+          //     where: { id },
+          //     update: food,
+          //     create: { id, ...food },
+          //   });
+          // }
 
           return null;
         },
