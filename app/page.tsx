@@ -26,6 +26,7 @@ export default function Home() {
     carbs: "",
   });
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const dailyGoal = { calories: 2000, protein: 50, fat: 70, carbs: 300 };
 
@@ -54,6 +55,27 @@ export default function Home() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    //Validation
+    const numCalories = Number(form.calories);
+    const numProtein = Number(form.protein);
+    const numFat = Number(form.fat);
+    const numCarbs = Number(form.carbs);
+
+    if (
+      isNaN(numCalories) ||
+      isNaN(numProtein) ||
+      isNaN(numFat) ||
+      isNaN(numCarbs)
+    ) {
+      setError("All nutrition values must be numbers");
+      return;
+    }
+
+    if (numCalories < 0 || numProtein < 0 || numFat < 0 || numCarbs < 0) {
+      setError("Values cannot be negative");
+      return;
+    }
+    setError(null);
 
     if (editingId) {
       // update existing entry (just client-side for nu)
@@ -143,38 +165,39 @@ export default function Home() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           className="w-full p-3 placeholder-gray-400 text-gray-800 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400 focus:outline-none"
         />
+
         <input
           name="calories"
           placeholder="Calories"
-          type="number"
           value={form.calories}
           onChange={(e) => setForm({ ...form, calories: e.target.value })}
           className="w-full p-3 placeholder-gray-400 text-gray-800 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400 focus:outline-none"
         />
+        {error && <p className="text-red-600 font-semibold mb-2">{error}</p>}
         <input
           name="protein"
           placeholder="Protein"
-          type="number"
           value={form.protein}
           onChange={(e) => setForm({ ...form, protein: e.target.value })}
           className="w-full p-3 placeholder-gray-400 text-gray-800 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400 focus:outline-none"
         />
+        {error && <p className="text-red-600 font-semibold mb-2">{error}</p>}
         <input
           name="fat"
           placeholder="Fat"
-          type="number"
           value={form.fat}
           onChange={(e) => setForm({ ...form, fat: e.target.value })}
           className="w-full p-3 placeholder-gray-400 text-gray-800 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400 focus:outline-none"
         />
+        {error && <p className="text-red-600 font-semibold mb-2">{error}</p>}
         <input
           name="carbs"
           placeholder="Carbs"
-          type="number"
           value={form.carbs}
           onChange={(e) => setForm({ ...form, carbs: e.target.value })}
           className="w-full p-3 placeholder-gray-400 text-gray-800 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-400 focus:outline-none"
         />
+        {error && <p className="text-red-600 font-semibold mb-2">{error}</p>}
         <button
           type="submit"
           className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 rounded-xl transition"
@@ -184,7 +207,7 @@ export default function Home() {
       </form>
 
       <section className="mt-8 w-full max-w-md">
-        <h2 className="text-xl font-semibold text-orange-500 mb-3">
+        <h2 className="text-2xl font-semibold text-green-700 mb-3">
           Intake today
         </h2>
         <ul className="space-y-2">

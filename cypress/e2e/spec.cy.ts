@@ -142,4 +142,30 @@ describe("Nutrition Tracker", () => {
 
     cy.get("ul li").should("have.length.lessThan", 3);
   });
+
+  it.only("should not allow negative values", () => {
+    cy.visit("/");
+
+    cy.get('input[placeholder="Food"').type("Test food");
+    cy.get('input[placeholder="Calories"').type("-100");
+    cy.get('input[placeholder="Protein"').type("10");
+    cy.get('input[placeholder="Fat"').type("5");
+    cy.get('input[placeholder="Carbs"').type("20");
+
+    cy.contains("Add").click();
+    cy.contains("Values cannot be negative").should("exist");
+  });
+
+  it.only("should not allow letters in numeric fields", () => {
+    cy.visit("/");
+
+    cy.get('input[placeholder="Food"').type("Test food");
+    cy.get('input[placeholder="Calories"').type("abc");
+    cy.get('input[placeholder="Protein"').type("10");
+    cy.get('input[placeholder="Fat"').type("5");
+    cy.get('input[placeholder="Carbs"').type("20");
+
+    cy.contains("Add").click();
+    cy.contains("All nutrition values must be numbers").should("exist");
+  });
 });
