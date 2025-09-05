@@ -1,92 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nutrition Tracker
+
+A simple nutrition tracking application built with **Next.js**, **TypeScript**, **Prisma**, and **MongoDB**.  
+The app allows users to log their meals and track calories, protein, fat, and carbs throughout the day.  
+It also includes progress bars, goal comparisons, and error handling for invalid input.
+
+---
+
+## Features
+
+- Add, edit, and delete food entries
+- Daily nutrition goals with progress indicators
+- Warnings when goals are exceeded
+- Basic form validation (no negative values, only numbers allowed)
+- Integration with a MongoDB database via Prisma
+- End-to-end testing with Cypress
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm, pnpm, or yarn
+- A MongoDB instance (Atlas or local)
+
+### Installation
+
+Clone the repository and install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd nutrition-tracker
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Database Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Configure your database connection in .env:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- DATABASE_URL="your-mongodb-connection-string"
 
-## Learn More
+2. Generate Prisma Client
 
-To learn more about Next.js, take a look at the following resources:
+- npx prisma generate
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. Run database migrations
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- npx prisma migrate dev
 
-## Deploy on Vercel
+## Running the App
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Start the development server:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- npm run dev
 
-### Användarflöden
+The app will be available at http://localhost:3000
 
-## 1. Logga en måltid
+## Testing
 
-1 Användaren öppnar appen.
+This project uses Cypress for end-to-end testing
+Run Cypress tests in headless mode:
 
-2 Går till formuläret för att lägga till mat.
+-npm run test:e2e
 
-3 Fyller i: namn ("Ägg"), kalorier (150), protein (12), fett (10), kolhydrater (1).
+Or open the Cypress UI
 
-4 Klickar på "Lägg till".
+-npx cypress open
 
-5 Ser att "Ägg" dyker upp i listan för dagens intag.
+Tests cover:
 
-6 Ser att progress bars uppdateras.
+- Creating, updating, and deleting food entries
 
-## 2. Överskrida ett mål
+- Displaying daily totals
 
-1 Användaren har redan ett mål på t.ex. 2000 kalorier.
+- Showing warnings when exceeding nutrition goals
 
-2 Loggar mat tills progress bar når 2000 kcal.
+- Handling invalid input
 
-3 Loggar ytterligare mat som gör att totalen blir > 2000 kcal.
+## Build for Production
 
-4 Appen visar en varning och hur mycket användaren har överskridit målet med (t.ex. röd text: "Du har överskridit ditt kalorimål med 250 kcal!").
+To build and start the app in production mode:
 
-## 3. Se dagens sammanfattning
+- npm run build
+- npm run start
 
-1 Användaren har loggat flera matintag.
+## Future Improvements
 
-2 Ser en lista över alla matintag.
+- User authentication
 
-3 Ser totalsummor (kalorier, protein, fett, kolhydrater) summerade längst ner.
+- Separate daily logs by date
 
-## 4. Se veckans sammanfattning
-
-1 Användaren har loggat mat under flera dagar (t.ex. 3 dagar).
-
-2 Går till "Veckovy".
-
-3 Ser summerade värden för kalorier, protein, fett och kolhydrater under veckan.
-
-4 (Extra) Ser stapeldiagram eller lista dag för dag.
-
-## 5. Uppdatera sina mål (om du hinner implementera detta)
-
-1 Användaren går till "Mina mål".
-
-2 Ändrar dagligt kalorimål från 2000 → 2500.
-
-3 Klickar Spara.
-
-4 Går tillbaka till dashboard.
-
-5 Ser att progress bars nu använder det nya målet.
+- Export data as CSV or PDF
